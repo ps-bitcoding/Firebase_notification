@@ -1,113 +1,96 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Firebase Notification System</title>
-    <script src="https://www.gstatic.com/firebasejs/8.6.3/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.6.3/firebase-messaging.js"></script>
 
-    <script>
-      // Initialize Firebase
-      firebase.initializeApp({
-        apiKey: `{{firebase_api_key}}`,
-        authDomain: `{{firebase_auth_domain}}`,
-        projectId: `{{firebase_project_id}}`,
-        storageBucket: `{{firebase_storage_bucket}}`,
-        messagingSenderId: `{{firebase_messaging_sender_id}}`,
-        appId: `{{firebase_app_id}}`,
-        measurementId: `{{firebase_measurement_id}}`,
-      });
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Firebase Notification System</title>
+  <script src="https://www.gstatic.com/firebasejs/8.6.3/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.6.3/firebase-messaging.js"></script>
 
-      const messaging = firebase.messaging();
+  <script>
+    // Initialize Firebase
+    firebase.initializeApp({
+      apiKey: `{{firebase_api_key}}`,
+      authDomain: `{{firebase_auth_domain}}`,
+      projectId: `{{firebase_project_id}}`,
+      storageBucket: `{{firebase_storage_bucket}}`,
+      messagingSenderId: `{{firebase_messaging_sender_id}}`,
+      appId: `{{firebase_app_id}}`,
+      measurementId: `{{firebase_measurement_id}}`,
+    });
 
-      async function fetchToken() {
-        try {
-          await messaging.requestPermission();
-          console.log("Notification permission granted.");
+    const messaging = firebase.messaging();
 
-          const token = await messaging.getToken({
-            vapidKey: `{{vapidkey}}`,
-          });
+    async function fetchToken() {
+      try {
+        await messaging.requestPermission();
+        console.log("Notification permission granted.");
 
-          if (token) {
-            console.log("FCM Token:", token);
-            document.getElementById("device-token").value = token;
-            alert("FCM Token fetched successfully!");
-          } else {
-            console.error("No registration token available.");
-          }
-        } catch (err) {
-          console.error("An error occurred while retrieving token.", err);
-        }
-      }
+        const token = await messaging.getToken({
+          vapidKey: `{{vapidkey}}`,
+        });
 
-      messaging.onMessage((payload) => {
-        console.log("Message received: ", payload);
-
-        // Extract notification details
-        const { title, body, icon } = payload.notification;
-
-        // Show a popup notification
-        if ("Notification" in window && Notification.permission === "granted") {
-          const notification = new Notification(title, {
-            body: body,
-            icon: icon || "https://via.placeholder.com/128", // Default icon if not provided
-          });
-
-          // Auto-close the notification after 3 seconds
-          setTimeout(() => {
-            notification.close();
-          }, 15000);
+        if (token) {
+          console.log("FCM Token:", token);
+          document.getElementById("device-token").value = token;
+          alert("FCM Token fetched successfully!");
         } else {
-          alert(`Notification received:\n${title}\n${body}`);
+          console.error("No registration token available.");
         }
-      });
+      } catch (err) {
+        console.error("An error occurred while retrieving token.", err);
+      }
+    }
 
-      // Call fetchToken on page load
-      document.addEventListener("DOMContentLoaded", fetchToken);
-    </script>
-  </head>
+    messaging.onMessage((payload) => {
+      console.log("Message received: ", payload);
 
-  <body>
-    <h1>Firebase Notification System</h1>
+      // Extract notification details
+      const { title, body, icon } = payload.notification;
 
-    <form action="{% url 'notification_sender' %}" method="post">
-      {% csrf_token %}
-      <label for="device-token">Device Token:</label>
-      <input
-        type="text"
-        name="token"
-        id="device-token"
-        placeholder="Fetching device token..."
-        style="width: 100%"
-      />
-      <br /><br />
+      // Show a popup notification
+      if ("Notification" in window && Notification.permission === "granted") {
+        const notification = new Notification(title, {
+          body: body,
+          icon: icon || "https://via.placeholder.com/128", // Default icon if not provided
+        });
 
-      <label for="title">Notification Title:</label>
-      <input
-        type="text"
-        name="title"
-        id="title"
-        placeholder="Enter Notification Title"
-        required
-        style="width: 100%"
-      />
-      <br /><br />
+        // Auto-close the notification after 3 seconds
+        setTimeout(() => {
+          notification.close();
+        }, 15000);
+      } else {
+        alert(`Notification received:\n${title}\n${body}`);
+      }
+    });
 
-      <label for="body">Notification Body:</label>
-      <textarea
-        id="body"
-        name="body"
-        placeholder="Enter Notification Body"
-        rows="4"
-        required
-        style="width: 100%"
-      ></textarea>
-      <br /><br />
+    // Call fetchToken on page load
+    document.addEventListener("DOMContentLoaded", fetchToken);
+  </script>
+</head>
 
-      <button type="submit">Send Notification</button>
-    </form>
-  </body>
+<body>
+  <h1>Firebase Notification</h1>
+
+  <form action="{% url 'notification_sender' %}" method="post">
+    {% csrf_token %}
+    <label for="device-token">Device Token:</label>
+    <input type="text" name="token" id="device-token" placeholder="Fetching device token..." style="width: 100%" />
+    <br /><br />
+
+    <label for="title">Notification Title:</label>
+    <input type="text" name="title" id="title" placeholder="Enter Notification Title" required style="width: 100%" />
+    <br /><br />
+
+    <label for="body">Notification Body:</label>
+    <textarea id="body" name="body" placeholder="Enter Notification Body" rows="4" required
+      style="width: 100%"></textarea>
+    <br /><br />
+
+    <button type="submit">Send Notification</button>
+  </form>
+</body>
+
 </html>
