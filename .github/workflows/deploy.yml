@@ -25,8 +25,6 @@ jobs:
             echo "Base Path: ${{ secrets.BASEPATH }}"
 
             git pull origin main # Pull the latest code
-
-            # sudo python3 manage.py runserver 8005
           EOF
 
       - name: Remove the private key file
