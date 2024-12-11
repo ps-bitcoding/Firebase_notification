@@ -20,7 +20,7 @@ jobs:
 
       - name: Deploy to Server
         run: |
-          ssh -i private_key -o StrictHostKeyChecking=no ${{ secrets.USERNAME }}@${{ secrets.HOST }} << 'EOF'
+          ssh -i private_key -o StrictHostKeyChecking=no ${{ secrets.USER }}@${{ secrets.EC2_IP_ADDRESS }} << 'EOF'
             cd ${{ secrets.BASEPATH }}  # Navigate to your project directory
             echo "Base Path: ${{ secrets.BASEPATH }}"
 
